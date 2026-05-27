@@ -3,6 +3,9 @@
 #include <Windows.h>
 #include <stdio.h>
 
+//#define WINDOWSUSERS
+
+//#include "..\..\Broken\Lib\Lib.cpp"
 #include "StringArray.h"
 #include "Buffer.h"
 #include "Strings.h"

@@ -128,6 +128,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BMail.cpp" />
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="SMTP.cpp" />
+    <ClCompile Include="StringArray.cpp" />
+    <ClCompile Include="Strings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Buffer.h" />
+    <ClInclude Include="SMTP.h" />
+    <ClInclude Include="StringArray.h" />
+    <ClInclude Include="Strings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
