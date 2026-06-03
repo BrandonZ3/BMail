@@ -13,36 +13,31 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Library">
+      <UniqueIdentifier>{687aca14-4379-4bde-aa73-97277837f387}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BMail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StringArray.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\Library\Bytes.cpp">
+      <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="Buffer.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\Library\DBuffer.cpp">
+      <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="Strings.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\Library\PointerList.cpp">
+      <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="SMTP.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\Library\Strings.cpp">
+      <Filter>Source Files\Library</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="StringArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Strings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SMTP.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="..\..\Library\SMTP.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Library\MemoryManipulation.cpp">
+      <Filter>Source Files\Library</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,10 +3,11 @@
 #include <Windows.h>
 #include <stdio.h>
 
-#include "StringArray.h"
-#include "Buffer.h"
-#include "Strings.h"
-#include "SMTP.h"
+#include "../../Library/Bytes.h"
+#include "../../Library/PointerList.h"
+#include "../../Library/DBuffer.h"
+#include "../../Library/Strings.h"
+#include "../../Library/SMTP.h"
 
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Ws2_32.lib")
@@ -62,8 +63,8 @@ int main()
         while (true)
         {
             char* sender = NULL;
-            StringArray* receivers = new StringArray(100);
-            Buffer* data = new Buffer(100);
+            PointerList* receivers = new PointerList();
+            DBuffer* data = new DBuffer(100);
             SMTPProcessState state = SMTPProcessState::NOTCONNECTED;
 
             client = accept(server, (sockaddr*)&addr, &length);
@@ -77,12 +78,12 @@ int main()
             lin.l_onoff = 1;
             lin.l_linger = 5;
 
-            DWORD timeout = 300000;
+            DWORD timeout = 10000;
 
             int isg = setsockopt(client, SOL_SOCKET, SO_LINGER, (const char*)&lin, linlength);
             isg = setsockopt(client, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(DWORD));
 
-            Buffer* recieveBuffer = NULL;
+            DBuffer* recieveBuffer = NULL;
 
             if (client)
             {
@@ -92,7 +93,7 @@ int main()
                     int len = 1024;
 
                     if (recieveBuffer == NULL)
-                        recieveBuffer = new Buffer(4096);
+                        recieveBuffer = new DBuffer(4096);
 
                     if (recieveBuffer)
                     {
@@ -103,7 +104,7 @@ int main()
 
                             if (len > 0)
                             {
-                                recieveBuffer->Add(buffer, len);
+                                recieveBuffer->Add((unsigned char*)buffer, len);
 
                                 if (recieveBuffer->count > 16000000)
                                 {
@@ -115,32 +116,32 @@ int main()
                             }
                         }
 
-                        recieveBuffer->Add(0);
-                        size_t count = StringCount((const char*)recieveBuffer->buffer, "\r\n");
+                        recieveBuffer->Add((uint8_t)0);
+                        size_t count = Strings::CountOf((const char*)recieveBuffer->DataPointer(0), "\r\n");
                         recieveBuffer->count--;
 
                         if (count >= 1)
                         {
-                            StringArray* messages = Splitter((const char*)recieveBuffer->buffer, "\r\n");
+                            PointerList* messages = PointerList::SplitString((const char*)recieveBuffer->DataPointer(0), "\r\n");
                             bool killConnection = false;
 
                             for (size_t i = 0; i < messages->count; i++)
                             {
-                                StringArray* parts = Splitter(messages->items[i], " ");
+                                PointerList* parts = PointerList::SplitString((const char*)messages->items[i], " ");
 
                                 if (state != SMTPProcessState::DATA)
                                 {
-                                    if (StringCompareCaseInsensitive(parts->items[0], "HELO"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "HELO"))
                                     {
                                         if (sender)
                                             free(sender);
 
                                         receivers->FreeEverything();
                                         delete receivers;
-                                        receivers = new StringArray(100);
+                                        receivers = new PointerList();
 
                                         delete data;
-                                        data = new Buffer(100);
+                                        data = new DBuffer(100);
 
                                         send(client, ok, strlen(ok), 0);
                                         state = SMTPProcessState::READY;
@@ -151,7 +152,7 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "NOOP"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "NOOP"))
                                     {
                                         send(client, ok, strlen(ok), 0);
 
@@ -160,17 +161,17 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "RSET"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "RSET"))
                                     {
                                         if (sender)
                                             free(sender);
 
                                         receivers->FreeEverything();
                                         delete receivers;
-                                        receivers = new StringArray(100);
+                                        receivers = new PointerList();
 
                                         delete data;
-                                        data = new Buffer(100);
+                                        data = new DBuffer(100);
 
                                         send(client, ok, strlen(ok), 0);
                                         state = SMTPProcessState::READY;
@@ -181,7 +182,7 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "QUIT"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "QUIT"))
                                     {
                                         if (sender)
                                             free(sender);
@@ -204,7 +205,7 @@ int main()
                                 {
                                     bool stateStepped = false;
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "MAIL"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "MAIL"))
                                     {
                                         bool countGood = true;
                                         bool syntaxGood = true;
@@ -217,10 +218,11 @@ int main()
 
                                         if (countGood)
                                         {
-                                            if (BufferToStringCompareCaseInsensitive(parts->items[1], "FROM:<") && parts->items[1][strlen(parts->items[1]) - 1] == '>' && CharCount(parts->items[1], '<') == 1 && CharCount(parts->items[1], '>') == 1)
+                                            
+                                            if (Bytes::MatchBytes((unsigned char*)parts->items[1], 6, (unsigned char*)"FROM:<") && ((const char*)parts->items[1])[strlen((const char*)parts->items[1]) - 1] == '>' && Strings::CharCount((const char*)parts->items[1], '<') == 1 && Strings::CharCount((const char*)parts->items[1], '>') == 1)
                                             {
-                                                size_t indexStart = FirstIndexOf(parts->items[1], "<") + 1;
-                                                size_t indexClose = FirstIndexOf(parts->items[1], ">");
+                                                size_t indexStart = Strings::IndexOf((const char*)parts->items[1], "<", 1) + 1;
+                                                size_t indexClose = Strings::IndexOf((const char*)parts->items[1], ">", 1);
 
                                                 size_t size = (indexClose - indexStart);
 
@@ -231,9 +233,11 @@ int main()
 
                                                 for (size_t i = indexStart; i < indexClose; i++)
                                                 {
-                                                    sender[pos] = parts->items[1][i];
+                                                    sender[pos] = ((const char*)parts->items[1])[i];
                                                     pos++;
                                                 }
+
+                                                printf("Sender:%s\r\n", sender);
                                             }
                                             else
                                             {
@@ -253,7 +257,7 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "RCPT"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "RCPT"))
                                     {
                                         send(client, badseq, strlen(badseq), 0);
                                         parts->FreeEverything();
@@ -261,7 +265,7 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "DATA"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "DATA"))
                                     {
                                         send(client, badseq, strlen(badseq), 0);
                                         parts->FreeEverything();
@@ -274,7 +278,7 @@ int main()
                                 {
                                     bool stateStepped = false;
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "RCPT"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "RCPT"))
                                     {
                                         bool countGood = true;
                                         bool syntaxGood = true;
@@ -287,10 +291,10 @@ int main()
 
                                         if (countGood)
                                         {
-                                            if (BufferToStringCompareCaseInsensitive(parts->items[1], "TO:<") && parts->items[1][strlen(parts->items[1]) - 1] == '>' && CharCount(parts->items[1], '<') == 1 && CharCount(parts->items[1], '>') == 1)
+                                            if (Bytes::MatchBytes((unsigned char*)parts->items[1], 4, (unsigned char*)"TO:<") && ((char*)parts->items[1])[strlen((const char*)parts->items[1]) - 1] == '>' && Strings::CharCount((const char*)parts->items[1], '<') == 1 && Strings::CharCount((const char*)parts->items[1], '>') == 1)
                                             {
-                                                size_t indexStart = FirstIndexOf(parts->items[1], "<") + 1;
-                                                size_t indexClose = FirstIndexOf(parts->items[1], ">");
+                                                size_t indexStart = Strings::IndexOf((const char*)parts->items[1], "<", 1) + 1;
+                                                size_t indexClose = Strings::IndexOf((const char*)parts->items[1], ">", 1);
 
                                                 size_t size = (indexClose - indexStart);
 
@@ -301,11 +305,11 @@ int main()
 
                                                 for (size_t i = indexStart; i < indexClose; i++)
                                                 {
-                                                    rec[pos] = parts->items[1][i];
+                                                    rec[pos] = ((char*)parts->items[1])[i];
                                                     pos++;
                                                 }
 
-                                                receivers->Add(rec);
+                                                receivers->AddPointer(rec);
                                             }
                                             else
                                             {
@@ -324,7 +328,7 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "MAIL"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "MAIL"))
                                     {
                                         send(client, badseq, strlen(badseq), 0);
                                         parts->FreeEverything();
@@ -332,7 +336,7 @@ int main()
                                         continue;
                                     }
 
-                                    if (StringCompareCaseInsensitive(parts->items[0], "DATA"))
+                                    if (Strings::CompareCaseInsensitive((const char*)parts->items[0], "DATA"))
                                     {
                                         state = SMTPProcessState::DATA;
                                         send(client, startdata, strlen(startdata), 0);
@@ -344,16 +348,24 @@ int main()
 
                                 if (state == SMTPProcessState::DATA)
                                 {
-                                    recieveBuffer->Add(0);
-                                    size_t count = StringCount((const char*)recieveBuffer->buffer, "\r\n");
-                                    data->Add((char*)recieveBuffer->buffer, strlen((const char*)recieveBuffer->buffer));
+                                    recieveBuffer->Add((uint8_t)0);
+                                    size_t count = Strings::CountOf((const char*)recieveBuffer->DataPointer(0), "\r\n");
+                                    data->Add((unsigned char*)recieveBuffer->DataPointer(0), strlen((const char*)recieveBuffer->DataPointer(0)));
                                     recieveBuffer->count--;
 
-                                    data->Add(0);
+                                    data->Add((uint8_t)0);
 
-                                    if (Contains((const char*)data->buffer, "\r\n.\r\n"))
+                                    if (Strings::Contains((const char*)data->DataPointer(0), "\r\n.\r\n"))
                                     {
+                                        printf("Receivers:\r\n");
+                                        for (int i = 0; i < receivers->count; i++)
+                                        {
+                                            printf("%s\r\n", receivers->items[i]);
+                                        }
                                         state = SMTPProcessState::READY;
+                                        data->count -= 6; //Remove "\r\n.\r\n0"
+                                        data->Add((uint8_t)0);
+                                        printf("%s\r\n\r\n", data->DataPointer(0));
                                         send(client, ok, strlen(ok), 0);
                                     }
 
