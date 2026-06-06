@@ -3,11 +3,11 @@
 #include <Windows.h>
 #include <stdio.h>
 
-#include "../../Library/Bytes.h"
-#include "../../Library/PointerList.h"
-#include "../../Library/DBuffer.h"
-#include "../../Library/Strings.h"
-#include "../../Library/SMTP.h"
+#include "../../Library/Base/Bytes.h"
+#include "../../Library/Containers/PointerList.h"
+#include "../../Library/Containers/DBuffer.h"
+#include "../../Library/Base/Strings.h"
+#include "../../Library/Protocols/SMTP.h"
 
 #pragma comment(lib, "User32.lib")
 #pragma comment(lib, "Ws2_32.lib")

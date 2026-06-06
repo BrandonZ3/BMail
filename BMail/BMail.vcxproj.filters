@@ -21,22 +21,22 @@
     <ClCompile Include="BMail.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Library\Bytes.cpp">
+    <ClCompile Include="..\..\Library\Base\Bytes.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Library\DBuffer.cpp">
+    <ClCompile Include="..\..\Library\Containers\DBuffer.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Library\PointerList.cpp">
+    <ClCompile Include="..\..\Library\Base\MemoryManipulation.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Library\Strings.cpp">
+    <ClCompile Include="..\..\Library\Containers\PointerList.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Library\SMTP.cpp">
+    <ClCompile Include="..\..\Library\Protocols\SMTP.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Library\MemoryManipulation.cpp">
+    <ClCompile Include="..\..\Library\Base\Strings.cpp">
       <Filter>Source Files\Library</Filter>
     </ClCompile>
   </ItemGroup>

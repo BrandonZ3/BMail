@@ -127,12 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Library\Bytes.cpp" />
-    <ClCompile Include="..\..\Library\DBuffer.cpp" />
-    <ClCompile Include="..\..\Library\MemoryManipulation.cpp" />
-    <ClCompile Include="..\..\Library\PointerList.cpp" />
-    <ClCompile Include="..\..\Library\SMTP.cpp" />
-    <ClCompile Include="..\..\Library\Strings.cpp" />
+    <ClCompile Include="..\..\Library\Base\Bytes.cpp" />
+    <ClCompile Include="..\..\Library\Base\MemoryManipulation.cpp" />
+    <ClCompile Include="..\..\Library\Base\Strings.cpp" />
+    <ClCompile Include="..\..\Library\Containers\DBuffer.cpp" />
+    <ClCompile Include="..\..\Library\Containers\PointerList.cpp" />
+    <ClCompile Include="..\..\Library\Protocols\SMTP.cpp" />
     <ClCompile Include="BMail.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
