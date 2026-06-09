@@ -5,8 +5,6 @@ The project is still a work in progress and was started as a learning project.
 
 [CPPLib Repo](https://github.com/BrandonZ3/CPPLib) is a dependency of this project.
 
-This project is still a work in progress.
-
 ---
 
 ## Getting Started
